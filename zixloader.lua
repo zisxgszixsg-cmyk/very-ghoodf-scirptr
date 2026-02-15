@@ -7,8 +7,8 @@
 local UIS = game:GetService("UserInputService")
 
 -- // CONFIGURACIÓN DE LINKS
-local PC_LINK = "TU_LINK_DE_PC_AQUÍ"
-local MOBILE_LINK = "TU_LINK_DE_MOBILE_AQUÍ"
+local PC_LINK = "https://raw.githubusercontent.com/zisxgszixsg-cmyk/very-ghoodf-scirptr/refs/heads/main/pc.lua"
+local MOBILE_LINK = "https://raw.githubusercontent.com/zisxgszixsg-cmyk/very-ghoodf-scirptr/refs/heads/main/mobile.lua"
 
 -- // DETECCIÓN DE PLATAFORMA
 local isMobile = false
