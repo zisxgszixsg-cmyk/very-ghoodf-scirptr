@@ -1,91 +1,59 @@
---[[
-    ZIXN MAIN V7 - SYNCED EDITION
-    - GodMode se activa con el Auto-Clicker
-    - Ultra Fast Kill & Anti-Cheat Bypass
+--[[ 
+    ZIXN V8 - THE FINAL FIX
+    - Sincronización GodMode + Kill
+    - Bypass de Anticheat Integrado
+    - Corrección de NIL Values
 ]]
 
 local Services = setmetatable({}, {
     __index = function(t, k) return game:GetService(k) end
 })
 
-local LocalPlayer = Services.Players.LocalPlayer
-local ReplicatedStorage = Services.ReplicatedStorage
-local RunService = Services.RunService
-local UserInputService = Services.UserInputService
+local LP = Services.Players.LocalPlayer
+local RS = Services.ReplicatedStorage
+local Run = Services.RunService
 
--- // ESTADO GLOBAL
-getgenv().AutoKillEnabled = false
-getgenv().GodModeEnabled = false -- Ahora inicia en false
+getgenv().AutoKill = false
 
--- // TRADUCCIONES [2026-02-08]
+-- Sistema de Idiomas (Nota y Cargando Motor) [2026-02-08]
 local T = (Services.LocalizationService.RobloxLocaleId:lower():sub(1,2) == "es") 
-    and {Kill = "ATAQUE INSTANTÁNEO", Auto = "AUTO-CLICKER: "} 
-    or {Kill = "INSTANT KILL", Auto = "AUTO-CLICKER: "}
+    and {Kill = "ATAQUE MANUAL", Auto = "AUTO-KILL (+GOD): "} 
+    or {Kill = "MANUAL KILL", Auto = "AUTO-KILL (+GOD): "}
 
------------------------------------------------------------
--- ANTI-DETECCIÓN
------------------------------------------------------------
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if method == "FireServer" and (tostring(self) == "MainEvent" or tostring(self):find("Detect")) then
-        return nil
-    end
-    return oldNamecall(self, ...)
-end)
-setreadonly(mt, true)
-
------------------------------------------------------------
--- LÓGICA DE COMBATE Y GODMODE
------------------------------------------------------------
-
-local function FastKill()
+-- Lógica de Ataque Optimizada
+local function DoKill()
     pcall(function()
-        local gameAttr = LocalPlayer:GetAttribute("Game")
-        local teamAttr = LocalPlayer:GetAttribute("Team")
+        local g = LP:GetAttribute("Game")
+        local t = LP:GetAttribute("Team")
         for _, p in pairs(Services.Players:GetPlayers()) do
-            if p ~= LocalPlayer and p:GetAttribute("Game") == gameAttr and p:GetAttribute("Team") ~= teamAttr then
-                ReplicatedStorage.KnifeKill:FireServer(p, p)
+            if p ~= LP and p:GetAttribute("Game") == g and p:GetAttribute("Team") ~= t then
+                RS.KnifeKill:FireServer(p, p)
             end
         end
     end)
 end
 
--- Bucle Principal (Maneja Kill y GodMode)
-task.spawn(function()
-    while true do
-        if getgenv().AutoKillEnabled then
-            -- Atacar
-            FastKill()
-            
-            -- Mantener Vida (GodMode Activo)
-            if LocalPlayer.Character then
-                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then hum.Health = hum.MaxHealth end
-            end
-            
-            RunService.Heartbeat:Wait() 
-        else
-            task.wait(0.3)
+-- Bucle de Auto-Matanza y GodMode
+Run.Heartbeat:Connect(function()
+    if getgenv().AutoKill then
+        DoKill()
+        -- GodMode Sync
+        if LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
+            LP.Character:FindFirstChildOfClass("Humanoid").Health = 100
         end
     end
 end)
 
 -----------------------------------------------------------
--- INTERFAZ
+-- INTERFAZ (FIXED)
 -----------------------------------------------------------
-
-local sg = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-sg.Name = "Zixn_Ultra_V7"
-sg.ResetOnSpawn = false
+local sg = Instance.new("ScreenGui", LP.PlayerGui)
+sg.Name = "ZixnFix"
 
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 250, 0, 200)
-Main.Position = UDim2.new(0.5, -125, 0.5, -100)
+Main.Size = UDim2.new(0, 240, 0, 180)
+Main.Position = UDim2.new(0.5, -120, 0.5, -90)
 Main.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
-Main.BorderSizePixel = 0
 Instance.new("UICorner", Main)
 
 local Stroke = Instance.new("UIStroke", Main)
@@ -94,7 +62,7 @@ task.spawn(function()
     local h = 0
     while true do
         Stroke.Color = Color3.fromHSV(h, 0.7, 1)
-        h = h + (1/400); RunService.RenderStepped:Wait()
+        h = h + (1/400); Run.RenderStepped:Wait()
     end
 end)
 
@@ -102,33 +70,26 @@ local Layout = Instance.new("UIListLayout", Main)
 Layout.Padding = UDim.new(0, 10); Layout.HorizontalAlignment = 1; Layout.VerticalAlignment = 1
 
 local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1, 0, 0, 40); Title.BackgroundTransparency = 1; Title.Text = "ZIXN1GGA V7 - SYNC"; Title.TextColor3 = Color3.new(1, 1, 1); Title.Font = "GothamBlack"; Title.TextSize = 13
+Title.Size = UDim2.new(1, 0, 0, 40); Title.BackgroundTransparency = 1; Title.Text = "ZIXN V8 PRO"; Title.TextColor3 = Color3.new(1, 1, 1); Title.Font = "GothamBlack"; Title.TextSize = 13
 
-local function CreateBtn(text, cb)
+local function Btn(text, cb)
     local b = Instance.new("TextButton", Main)
-    b.Size = UDim2.new(0.85, 0, 0, 40); b.BackgroundColor3 = Color3.fromRGB(25, 25, 30); b.Text = text; b.TextColor3 = Color3.new(1, 1, 1); b.Font = "GothamBold"; b.TextSize = 11; Instance.new("UICorner", b)
+    b.Size = UDim2.new(0.85, 0, 0, 40); b.BackgroundColor3 = Color3.fromRGB(30,30,35); b.Text = text; b.TextColor3 = Color3.new(1,1,1); b.Font = "GothamBold"; b.TextSize = 11; Instance.new("UICorner", b)
     b.MouseButton1Click:Connect(cb) return b
 end
 
-CreateBtn(T.Kill, FastKill)
-
-local AutoBtn = CreateBtn(T.Auto .. "OFF", function()
-    getgenv().AutoKillEnabled = not getgenv().AutoKillEnabled
-    
-    if getgenv().AutoKillEnabled then
-        AutoBtn.Text = T.Auto .. "ON (+GOD)"
-        AutoBtn.TextColor3 = Color3.fromRGB(0, 255, 150)
-    else
-        AutoBtn.Text = T.Auto .. "OFF"
-        AutoBtn.TextColor3 = Color3.new(1, 1, 1)
-    end
+Btn(T.Kill, DoKill)
+local AB = Btn(T.Auto .. "OFF", function()
+    getgenv().AutoKill = not getgenv().AutoKill
+    AB.Text = T.Auto .. (getgenv().AutoKill and "ON" or "OFF")
+    AB.TextColor3 = getgenv().AutoKill and Color3.fromRGB(0, 255, 150) or Color3.new(1,1,1)
 end)
 
--- Arrastre Suave
-local dragging, dragStart, startPos
-Main.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true; dragStart = input.Position; startPos = Main.Position end end)
-Main.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
-UserInputService.InputChanged:Connect(function(input) if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-    local delta = input.Position - dragStart
-    Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+-- Drag System
+local drag = false; local start; local pos
+Main.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = true; start = i.Position; pos = Main.Position end end)
+Main.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end end)
+Services.UserInputService.InputChanged:Connect(function(i) if drag and i.UserInputType == Enum.UserInputType.MouseMovement then
+    local d = i.Position - start
+    Main.Position = UDim2.new(pos.X.Scale, pos.X.Offset + d.X, pos.Y.Scale, pos.Y.Offset + d.Y)
 end end)
