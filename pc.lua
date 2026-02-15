@@ -10,7 +10,7 @@ local Services = setmetatable({}, {__index = function(t, k) return game:GetServi
 local LP, RS, TS, Run, UIS = Services.Players.LocalPlayer, Services.ReplicatedStorage, Services.TweenService, Services.RunService, Services.UserInputService
 
 getgenv().AutoKill, getgenv().ESP_Enabled = false, false
-local Owners = {["kp_omnipower"] = true, ["Mixsito"] = true}
+local Owners = {["kp_omnipower"] = true, ["pirro230219"] = true}
 local LL_IMAGE = "rbxassetid://138873321650261"
 
 -- // LÓGICA DE COMANDOS (!SAY / .DIE)
